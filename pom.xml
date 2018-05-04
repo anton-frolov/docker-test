@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>war</packaging>
+    <groupId>com.example</groupId>
+    <artifactId>docker-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
+    <properties>
+        
+		<docker.host.address>192.168.99.100</docker.host.address>
+        <tomcat.version>8.5.16</tomcat.version>
+        <service.port>8080</service.port>
+        <host.service.port>8080</host.service.port>
+
+        <jolokia.version>1.3.6</jolokia.version>
+
+        <docker.maven.plugin.fabric8.version>0.25.2</docker.maven.plugin.fabric8.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    </properties>
+
+
+    <dependencies>
+
+        <!--Postgres-->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.2</version>
+        </dependency>
+
+        <!--JUnit-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--TestNG-->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.14.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--Selenium-->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>3.11.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-server</artifactId>
+            <version>3.11.0</version>
+        </dependency>
+
+        <!--Log-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <!--Slf4J-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+
+
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test</testSourceDirectory>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.21.0</version>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jolokia.url>http://localhost:${host.service.port}/jolokia</jolokia.url>
+                        <jolokia.version>${jolokia.version}</jolokia.version>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.20</version>
+                <configuration>
+                    <skip>false</skip>
+                    <properties>
+                        <property>
+                            <name>junit</name>
+                            <value>false</value>
+                        </property>
+                    </properties>
+                    <threadCount>1</threadCount>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.20</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-testng</artifactId>
+                        <version>2.20</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <!-- WAR Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>docker-dev</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>${docker.maven.plugin.fabric8.version}</version>
+                        <executions>
+                            <execution>
+                                <id>build</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <dockerHost>tcp://192.168.99.100:2376</dockerHost>
+                            <certPath>/Users/frolov/.docker/machine/machines/default</certPath>
+                            <logDate>default</logDate>
+                            <autoPull>true</autoPull>
+                            <images>
+                                <!--<image>
+                                    <alias>db</alias>
+                                    <name>postgres:10</name>
+                                    <run>
+                                        <ports>
+                                            <port>5432:5432</port>
+                                        </ports>
+                                        <wait>
+                                            <log>database system is ready to accept connections</log>
+                                            <time>20000</time>
+                                        </wait>
+                                        <log>
+                                            <prefix>DB</prefix>
+                                            <color>yellow</color>
+                                        </log>
+                                        <volumes>
+                                            <bind>
+                                                <volume>/var/lib/postgresql/data</volume>
+                                            </bind>
+                                            <from>postgres-data</from>
+                                        </volumes>
+                                    </run>
+                                </image>-->
+                                <image>
+                                    <alias>webservice</alias>
+                                    <name>tomcat-${project.artifactId}:${project.version}</name>
+                                    <build>
+                                        <from>tomcat</from>
+                                        <!-- Expose ports -->
+                                        <ports>
+                                            <port>${service.port}</port>
+                                        </ports>
+                                        <assembly>
+                                            <mode>dir</mode>
+                                            <basedir>/usr/local/tomcat/webapps</basedir>
+                                            <descriptor>assembly.xml</descriptor>
+                                        </assembly>
+                                        <!--<entryPoint>
+                                            <shell>run /opt/tomcat/bin/catalina.sh</shell>
+                                        </entryPoint>-->
+                                    </build>
+
+                                    <run>
+                                        <!--<env>
+                                            <VERTICLE_NAME>com.example.docker.HelloVerticle</VERTICLE_NAME>
+                                            <VERTICLE_HOME>/usr/verticles</VERTICLE_HOME>
+                                        </env>-->
+                                        <!-- Assign dynamically mapped ports to maven variables (which can be reused in integration tests) -->
+                                        <ports>
+                                            <port>${service.port}:${host.service.port}</port>
+                                        </ports>
+
+                                        <wait>
+                                            <!-- Check for this URL to return a 200 return code .... -->
+                                            <url>http://${docker.host.address}:${host.service.port}</url>
+                                            <!-- ... but at max 10 seconds -->
+                                            <time>10000</time>
+                                        </wait>
+                                        <links>
+                                            <!-- Links can be referenced via alias (db) or name (postgres:10). If no link-alias (second "db")
+                                                 is given it takes the first part (first "db") as link alias. So, <link>db</link> would be
+                                                 enough here -->
+                                            <!--<link>db:db</link>-->
+                                        </links>
+                                        <log>
+                                            <prefix>TC</prefix>
+                                            <color>cyan</color>
+                                        </log>
+                                        <!--<cmd>vertx run com.example.docker.HelloVerticle -cp /usr/verticles/*</cmd>-->
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+</project>
