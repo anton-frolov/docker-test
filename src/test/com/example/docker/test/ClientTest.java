@@ -15,6 +15,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -28,6 +29,7 @@ public class ClientTest {
     private WebDriver driver;
     String url = "http://192.168.99.100:8080/docker-test/";
 
+    @Ignore
     @BeforeClass
     public void setUp() throws IOException{
 
@@ -42,7 +44,7 @@ public class ClientTest {
     }
 
 
-
+    @Ignore
     @Test
     public void verifyMainPageTittle() {
         driver.navigate().to(url);
@@ -50,6 +52,7 @@ public class ClientTest {
         Assert.assertTrue(getTitle.equalsIgnoreCase("test docker"));
     }
 
+    @Ignore
     @AfterClass
     public void tearDown() {
         if(driver!=null) {
