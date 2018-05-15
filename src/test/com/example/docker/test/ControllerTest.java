@@ -45,7 +45,6 @@ public class ControllerTest {
     public void testRoot() throws Exception {
         mockMvc.perform(get("/")
                 .accept(MediaType.TEXT_HTML))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(forwardedUrl("/WEB-INF/views/home.jsp"));
     }

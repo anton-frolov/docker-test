@@ -20,7 +20,7 @@
 				<tbody>
 					<tr>
 						<td>
-							<form name="loginForm" id="login" action="/docker-test/login" method="post" class="form-horizontal">
+							<form name="loginForm" id="login" action="<%=request.getContextPath()%>/login" method="post" class="form-horizontal">
 								<div class="mLogin" class="form-group" style="width: 355px; height: 150px;">
 									<div class="form-group">
 										<label for="inputUsername" class="col-sm-2 control-label">Логин</label>

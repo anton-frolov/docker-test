@@ -349,7 +349,7 @@
                                             <!-- Check for this URL to return a 200 return code .... -->
                                             <url>http://${docker.host.address}:${host.service.port}</url>
                                             <!-- ... but at max 10 seconds -->
-                                            <time>10000</time>
+                                            <time>60000</time>
                                         </wait>
                                         <links>
                                             <!-- Links can be referenced via alias (db) or name (postgres:10). If no link-alias (second "db")

@@ -10,17 +10,24 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled=true, jsr250Enabled=false)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         try {
-            auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
-            auth.inMemoryAuthentication().withUser("admin").password("password").roles("ADMIN");
+            auth.inMemoryAuthentication()
+                    .passwordEncoder(NoOpPasswordEncoder.getInstance())
+                    .withUser("user").password("password").roles("USER");
+            auth.inMemoryAuthentication()
+                    .passwordEncoder(NoOpPasswordEncoder.getInstance())
+                    .withUser("admin").password("password").roles("ADMIN");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -30,14 +37,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web
                 .ignoring()
-                .antMatchers("/css/**","/main/**", "/dispatch/**");
+                .antMatchers("/css/**","/js/**", "/main/**", "/dispatch/**");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
+         http
                 .csrf()
-                .disable()
+                    .disable()
                 .authorizeRequests()
                 .anyRequest().access("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
                 .and()
@@ -50,6 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/logout")
                 .permitAll();
+
     }
 
     @Bean

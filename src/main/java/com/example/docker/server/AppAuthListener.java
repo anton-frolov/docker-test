@@ -27,7 +27,7 @@ public class AppAuthListener  {
             builder.append("; exception: ");
             builder.append(((AbstractAuthenticationFailureEvent) event).getException().getMessage());
         }
-        logger.error(builder.toString()+" ====");
+        logger.info(builder.toString()+" ====");
         String ip = "";
         if(event.getAuthentication().getDetails() instanceof WebAuthenticationDetails){
             ip = ((WebAuthenticationDetails) event.getAuthentication().getDetails()).getRemoteAddress();
