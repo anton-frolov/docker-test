@@ -3,6 +3,9 @@ package com.example.docker.test;
  * Created by frolov on 02.05.2018.
  */
 
+/**
+*  Link on driver download pages in src/test/resources/DriverLinks
+*/
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
