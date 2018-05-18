@@ -49,6 +49,15 @@ public class ControllerTest {
                 .andExpect(forwardedUrl("/WEB-INF/views/home.jsp"));
     }
 
+    @Test
+    public void testSecurePingController() throws Exception {
+        mockMvc.perform(get("/secured/ping")
+                .accept(MediaType.TEXT_HTML))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("Authenticated!"));
+    }
+
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
